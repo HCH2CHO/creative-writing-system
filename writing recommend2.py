@@ -57,7 +57,7 @@ class TFIDF(object):
              for kword in sortTFIDF:
                  kcout+=1
                  if kcout >100:
-                     self.fictionInfo[iword].pop(kword[0])
+                     self.fictionInfo[iword].pop(kword)
                
              weightAll=0
              for jword in self.fictionInfo[iword]:
