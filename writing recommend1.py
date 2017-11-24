@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on Sun Nov  5 18:15:54 2017
+Created on Fri Nov 24 15:12:57 2017
 
 @author: HCHO
 """
@@ -9,19 +9,36 @@ import string
 import operator
 import os
 import syllables_en
+import sqlite3
+
+#可使用相对路径./（或不用）当前文件夹 或 ../上一层文件夹
+path="C:\\Users\\HCHO\\Desktop\\creative Writing\\story\\" #小说所在目录
+ 
+conn=sqlite3.connect('fictData.db')
+cur=conn.cursor()
+cur.execute('''
+CREATE TABLE if not exixts fiction(
+        id  TEXT  PRIMARY KEY,
+        words INT,
+        wordfre TEXT,
+        sl FLOAT,
+        wl FLOAT,
+        RE FLOAT,
+        TF-IDF TEXT,
+        reArticle TEXT)
+''')
+conn.commit()
+
 
 class nGramAlgo(object):
-
     def __init__(self,fiction):
         self.fiction=fiction  
         self.words=0
-        self.ngrams=0
+        self.ngrams
         self.sl=0  #句子的平均单词数
         self.wl=0  #每100个词的平均音节数
         self.RE=0
         
-        
-    
     def cleanText(self):
         fiction = re.sub('\n+', " ", self.fiction).lower() # 匹配换行用空格替换成空格,大写转换成小写
         fiction = re.sub(' +', " ", fiction) #  把连续多个空格替换成一个空格
@@ -39,7 +56,6 @@ class nGramAlgo(object):
         fiction = self.cleanText()
         #print (len(fiction))
         output = {} # 构造字典
-
                  
         wordNum=len(fiction)
         for i in range(len(fiction)-n+1):
@@ -54,7 +70,8 @@ class nGramAlgo(object):
     
     def select150words(self):
         self.ngrams,self.words = self.getNgrams(1)
-        sortedNGrams = sorted(self.ngrams.items(), key = operator.itemgetter(1), reverse=True) #operator.itemgetter获取某个值 reverse=True 降序排列
+        sortedNGrams = sorted(self.ngrams.items(), key = operator.itemgetter(1), reverse=True) 
+        #operator.itemgetter获取某个值 reverse=True 降序排列
         
         count150=1 #计数，取词频最高的150个词
         for num in sortedNGrams:
@@ -62,16 +79,7 @@ class nGramAlgo(object):
                 self.ngrams.pop(num[0])
             count150+=1
 
-    def returnwords(self):
-        return self.words,self.ngrams  #单词数，词频列表
-    
-    def printwords(self,filepath):
-        #filepath.write(file.replace('.txt','')+'!'+str(self.words)+' !'+str(self.RE)+' !'+str(self.ngrams)+'\n') #按格式存储文件名、有用词数、词频
-        self.ngrams=sorted(self.ngrams.items(),key = lambda t:t[1],reverse=True)
-        filepath.write(file.replace('.txt','')+'!'+str(self.words)+'!'+str(self.wl)+'!'+str(self.sl)+'!'+str(self.RE)+'!'+str(self.ngrams)+'\n')
-
-    def Readablility(self): #易读性公式
-    
+    def Readablility(self): #易读性公式    
         fictionTxt=self.fiction.replace('...','.')
         fictionList=re.split('[.?!]',fictionTxt)
         #print (len(fictionList))
@@ -83,26 +91,26 @@ class nGramAlgo(object):
         self.sl=self.words/(len(fictionList)-i)
         self.wl=self.wl/self.words*100
         self.RE=206.835-0.846*self.wl-1.015*self.sl
-        #print (self.wl,self.sl,self.RE)
+        #print (self.sl,self.wl,self.RE)
         
-  
+    def returnwords(self):
+        return self.words,self.ngrams  #单词数，词频列表
+    
+    def insertDatabase(self):
+        self.ngrams=sorted(self.ngrams.items(),key = lambda t:t[1],reverse=True)
+        sql_insert= "INSERT INTO fication VALUES({1})".format(str(file.replace('.txt','')),self.words,str(self.ngrams),self.sl,self.wl,self.RE)
+        cur.execute(sql_insert)
+        conn.commit() 
+        
 if __name__ == '__main__':
-    #content= open('C:\\Users\\HCHO\\Desktop\\Julia Ward Howe.txt','r').read()
-    #对本地文件的读取，测试时候用，因为无需联网
-    #content = open("1.txt").read()
-    cfile=open("C:\\Users\\HCHO\\Desktop\\fiction KeyWords.csv","w")#可使用相对路径./（或不用）当前文件夹 或 ../上一层文件夹
-    #cfile=open("C:\\Users\\HCHO\\Desktop\\all.csv","w")
-    #path="C:\\Users\\HCHO\\Desktop\\creative Writing\\short fictions\\"
-    path="C:\\Users\\HCHO\\Desktop\\creative Writing\\all fictions\\"
     for root , dirs, files in os.walk(path):
-        for file in files:            
+        for file in files:          
             txt=open(root+'\\'+file,'r')
             content=txt.read()
                                    
             result=nGramAlgo(content)
             result.select150words()
             result.Readablility()
-            result.printwords(cfile)
+            result.insertDatabase()
            
-            txt.close()            
-    cfile.close()       
+            txt.close()
