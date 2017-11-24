@@ -98,7 +98,7 @@ class nGramAlgo(object):
     
     def insertDatabase(self):
         self.ngrams=sorted(self.ngrams.items(),key = lambda t:t[1],reverse=True)
-        sql_insert= "INSERT INTO fication VALUES({1})".format(str(file.replace('.txt','')),self.words,str(self.ngrams),self.sl,self.wl,self.RE)
+        sql_insert= "INSERT INTO fication VALUES({0},{1},{2},{3},{4},{5})".format(str(file.replace('.txt','')),self.words,str(self.ngrams),self.sl,self.wl,self.RE)
         cur.execute(sql_insert)
         conn.commit() 
         
@@ -114,3 +114,5 @@ if __name__ == '__main__':
             result.insertDatabase()
            
             txt.close()
+    
+    conn.close()

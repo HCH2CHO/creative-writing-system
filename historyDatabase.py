@@ -11,7 +11,13 @@ cur=conn.cursor()
 cur.execute('''
 CREATE TABLE if not exixts history(
         id  TEXT  PRIMARY KEY,
+        user TEXT,
         readinglist TEXT)
 ''')
 conn.commit()
 
+for 
+    sql_insert="INSERT INTO history VALUES({0},{1})".format(name,string)
+    cur.execute(sql_insert)
+    conn.commit()
+conn.close()

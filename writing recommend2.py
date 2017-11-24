@@ -33,15 +33,15 @@ class TFIDF(object):
             self.cout+=1
     
     def  calculateTFIDF(self):
-        for iword in self.fictionKeyDict:  #文章名
+         for iword in self.fictionKeyDict:  #文章名
             for jword in self.fictionKeyDict[iword]:  #词
                 if jword not in self.allDict:
                     self.allDict[jword]=1
                 else:
                     self.allDict[jword]+=1
         
-        reDict={}   #两层字典结构        
-        for iword in self.fictionKeyDict:
+         reDict={}   #两层字典结构        
+         for iword in self.fictionKeyDict:
              self.fictionInfo[iword]={}
              reDict[iword]={}
              
@@ -65,11 +65,14 @@ class TFIDF(object):
              for jword in self.fictionInfo[iword]:
                  self.fictionInfo[iword][jword].append(float(100*self.fictionInfo[iword][jword][2]/weightAll))
                  reDict[iword][jword]=self.fictionInfo[iword][jword][3]
-
+    
              sortline=sorted(reDict[iword].items(), key = lambda t:t[1], reverse=True) #按weight排序
-             sql_update="UPDATE fiction SET TF-IDF={0} WHERE photoId={1}".format(str(sortline),iword)
+             sql_update="UPDATE fiction SET TF-IDF={0} WHERE id={1}".format(str(sortline),iword)
              cur.execute(sql_update)      
              conn.commit()
+             
+         conn.close()    
+
          #return reDict
              
     def reAllDict(self):
@@ -79,3 +82,5 @@ if __name__ == '__main__':
     ai=TFIDF()
     ai.readFile()
     ai.calculateTFIDF() #100个词及权重
+    
+                     
