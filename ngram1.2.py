@@ -9,6 +9,18 @@ import string
 import operator
 import os
 import syllables_en
+import sqlite3
+
+conn=sqlite3.connect('fictData.db')
+curs=conn.cursor()
+
+curs.execute('''
+CREATE TABLE fiction(
+        id  TEXT  PRIMARY KEY
+        words INT,
+        wordfrequency JSON,
+        readablility FLOAT)
+''')
 
 class nGramAlgo(object):
 
@@ -90,8 +102,8 @@ if __name__ == '__main__':
     #content= open('C:\\Users\\HCHO\\Desktop\\Julia Ward Howe.txt','r').read()
     #对本地文件的读取，测试时候用，因为无需联网
     #content = open("1.txt").read()
-    #cfile=open("C:\\Users\\HCHO\\Desktop\\fiction KeyWords.csv","w")
-    cfile=open("C:\\Users\\HCHO\\Desktop\\all.csv","w")
+    cfile=open("C:\\Users\\HCHO\\Desktop\\fiction KeyWords.csv","w")#可使用相对路径./（或不用）当前文件夹 或 ../上一层文件夹
+    #cfile=open("C:\\Users\\HCHO\\Desktop\\all.csv","w")
     sentenceLength={} #用于句子长度统计
     #path="C:\\Users\\HCHO\\Desktop\\creative Writing\\short fictions\\"
     path="C:\\Users\\HCHO\\Desktop\\creative Writing\\all fictions\\"
@@ -107,4 +119,3 @@ if __name__ == '__main__':
            
             txt.close()            
     cfile.close()       
-
