@@ -35,7 +35,7 @@ query='INSERT INTO food VALUES(?,?,?,?,?,?,?,?,?,?)'
 for line in open('ABBREV.txt'):
     fields=line.split('^')
     vals=[convert(f) for f in fields]
-    curs.execute(query.vals)
+    curs.execute(query,vals)
     
 conn.commit()
 conn.close()

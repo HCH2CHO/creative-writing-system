@@ -13,18 +13,18 @@ import sqlite3
 
 #可使用相对路径./（或不用）当前文件夹 或 ../上一层文件夹
 path="C:\\Users\\HCHO\\Desktop\\creative Writing\\story\\" #小说所在目录
- 
+   
 conn=sqlite3.connect('fictData.db')
 cur=conn.cursor()
 cur.execute('''
-CREATE TABLE if not exixts fiction(
+CREATE TABLE if not exists fiction(
         id  TEXT  PRIMARY KEY,
         words INT,
         wordfre TEXT,
         sl FLOAT,
         wl FLOAT,
         RE FLOAT,
-        TF-IDF TEXT,
+        TFIDF TEXT,
         reArticle TEXT)
 ''')
 conn.commit()
@@ -34,7 +34,7 @@ class nGramAlgo(object):
     def __init__(self,fiction):
         self.fiction=fiction  
         self.words=0
-        self.ngrams
+        self.ngrams={}
         self.sl=0  #句子的平均单词数
         self.wl=0  #每100个词的平均音节数
         self.RE=0
@@ -98,9 +98,15 @@ class nGramAlgo(object):
     
     def insertDatabase(self):
         self.ngrams=sorted(self.ngrams.items(),key = lambda t:t[1],reverse=True)
-        sql_insert= "INSERT INTO fication VALUES({0},{1},{2},{3},{4},{5})".format(str(file.replace('.txt','')),self.words,str(self.ngrams),self.sl,self.wl,self.RE)
-        cur.execute(sql_insert)
-        conn.commit() 
+        try:
+            sql_insert="INSERT INTO fiction(id,words,wordfre,sl,wl,RE) VALUES(?,?,?,?,?,?)"
+            vals=[str(file.replace('.txt','')),self.words,str(self.ngrams),self.sl,self.wl,self.RE]
+            cur.execute(sql_insert,vals)
+            #sql_insert= "INSERT INTO fication VALUES({0},{1},{2},{3},{4},{5})".format(str(file.replace('.txt','')),self.words,str(self.ngrams),self.sl,self.wl,self.RE)
+            #cur.execute(sql_insert)
+            conn.commit() 
+        except:
+            print('error')
         
 if __name__ == '__main__':
     for root , dirs, files in os.walk(path):
@@ -114,5 +120,5 @@ if __name__ == '__main__':
             result.insertDatabase()
            
             txt.close()
-    
+               
     conn.close()

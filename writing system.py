@@ -17,7 +17,7 @@ cur=conn.cursor()
 
 def getAllWords():
     allwordsDict={}
-    sql_select="SELECT id,TF-IDF FROM fiction;"
+    sql_select="SELECT id,TFIDF FROM fiction;"
     while True:            
         try:
             cur.execute(sql_select)
@@ -108,7 +108,7 @@ class TFIDF(object):  #该部分可改进，提高速度
         self.reDict={}
         
     def readFile(self): #将数据库中词频储存在fictionKeyDict中，文章词数储存在fictionWords中       
-        sql_select="SELECT id,RE,TF-IDF,reArticle FROM fiction;"
+        sql_select="SELECT id,RE,TFIDF,reArticle FROM fiction;"
         while True:            
             try:
                 cur.execute(sql_select)
@@ -126,7 +126,7 @@ class TFIDF(object):  #该部分可改进，提高速度
         return self.relatedDict
     
     def  calculateTFIDF(self):        
-         reDict={}   #TF-IDF字典      
+         reDict={}   #TFIDF字典      
          for tword in inputArticle:
              #TF,IDF的计算
              TF=100*inputArticle[tword]/articleWords

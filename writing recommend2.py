@@ -20,7 +20,7 @@ class TFIDF(object):
         self.allDict={}  #全部文章词语的词典
 
     def readFile(self): #将数据库中词频储存在fictionKeyDict中，文章词数储存在fictionWords中       
-        sql_select="SELECT id,words,wordfre FROM fiction WHERE TF-IDF is null limit 1;"
+        sql_select="SELECT id,words,wordfre FROM fiction;"
         while True:            
             try:
                 cur.execute(sql_select)
@@ -67,7 +67,7 @@ class TFIDF(object):
                  reDict[iword][jword]=self.fictionInfo[iword][jword][3]
     
              sortline=sorted(reDict[iword].items(), key = lambda t:t[1], reverse=True) #按weight排序
-             sql_update="UPDATE fiction SET TF-IDF={0} WHERE id={1}".format(str(sortline),iword)
+             sql_update="UPDATE fiction SET TFIDF={0} WHERE id={1}".format(str(sortline),iword)
              cur.execute(sql_update)      
              conn.commit()
              
