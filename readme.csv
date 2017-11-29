@@ -2,3 +2,9 @@ Apriori     协同过滤
 creative    汇总后用于网页
 dataDeal    计算TF-IDF、文章可读性、文本相似度
 ngram   词频提取
+
+1 词频提取
+2 计算TFIDF值
+3 计算相关文章
+writing system
+historyDatabase

@@ -18,15 +18,9 @@ cur=conn.cursor()
 def getAllWords():
     allwordsDict={}
     sql_select="SELECT id,TFIDF FROM fiction;"
-    while True:            
-        try:
-            cur.execute(sql_select)
-            data=cur.fetchone()
-            conn.commit()
-        except:
-            break
-        
-        for aword in eval(data[1]):  #文章名
+    data=cur.execute(sql_select)
+    for row in data:    
+        for aword in eval(row[1]):  #文章名
             if aword not in allwordsDict:
                 allwordsDict[aword]=1
             else:
@@ -37,7 +31,7 @@ class nGramAlgo(object):
     def __init__(self,fiction):
         self.fiction=fiction  
         self.words=0
-        self.ngrams
+        self.ngrams={}
         self.sl=0  #句子的平均单词数
         self.wl=0  #每100个词的平均音节数
         
@@ -107,18 +101,14 @@ class TFIDF(object):  #该部分可改进，提高速度
         self.relatedDict={} #协同过滤获取的文章
         self.reDict={}
         
-    def readFile(self): #将数据库中词频储存在fictionKeyDict中，文章词数储存在fictionWords中       
+    def readFile(self): #将数据库中词频储存在fictionKeyDict中，RE存在fictionRE中       
         sql_select="SELECT id,RE,TFIDF,reArticle FROM fiction;"
-        while True:            
-            try:
-                cur.execute(sql_select)
-                data=cur.fetchone()
-                conn.commit()
-            except:
-                break
-            self.fictionRE[data[0]]=int(data[1])
-            self.fictionKeyDict[data[0]]=eval(data[2])
-            self.relatedDict[data[0]]=eval(data[3])
+        data=cur.execute(sql_select)
+        for row in data:
+            self.fictionKeyDict[row[0]]=eval(row[2])
+            self.fictionRE[row[0]]=int(row[1])
+            if row[3]!= None:
+                self.relatedDict[row[0]]=eval(row[3])
             self.cout+=1
         conn.close()
         
@@ -152,7 +142,7 @@ class TFIDF(object):  #该部分可改进，提高速度
         articleList=[] #相似文章列表,子列表第一项为文章名
         for karticle in self.fictionRE:
             sim1=cosVector(self.fictionKeyDict[karticle],self.reDict)
-            sim2=0.1*(10-abs(conRE-self.fictionRE[karticle])) #关于可读性的公式存疑
+            sim2=0.0002*(100-abs(conRE-self.fictionRE[karticle])) #关于可读性的公式存疑
             articleList.append([karticle,sim1,sim2,sim1+sim2])
         return articleList
 

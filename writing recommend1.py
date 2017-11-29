@@ -97,7 +97,7 @@ class nGramAlgo(object):
         return self.words,self.ngrams  #单词数，词频列表
     
     def insertDatabase(self):
-        self.ngrams=sorted(self.ngrams.items(),key = lambda t:t[1],reverse=True)
+        #self.ngrams=sorted(self.ngrams.items(),key = lambda t:t[1],reverse=True)排序后为列表
         try:
             sql_insert="INSERT INTO fiction(id,words,wordfre,sl,wl,RE) VALUES(?,?,?,?,?,?)"
             vals=[str(file.replace('.txt','')),self.words,str(self.ngrams),self.sl,self.wl,self.RE]

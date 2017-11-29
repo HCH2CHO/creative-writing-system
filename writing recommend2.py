@@ -19,18 +19,14 @@ class TFIDF(object):
         self.cout=0       #项数、文章数
         self.allDict={}  #全部文章词语的词典
 
-    def readFile(self): #将数据库中词频储存在fictionKeyDict中，文章词数储存在fictionWords中       
+    def readFile(self): #将数据库中词频储存在fictionKeyDict中，文章词数储存在fictionWords中                   
         sql_select="SELECT id,words,wordfre FROM fiction;"
-        while True:            
-            try:
-                cur.execute(sql_select)
-                data=cur.fetchone()
-                conn.commit()
-            except:
-                break
-            self.fictionKeyDict[data[0]]=eval(data[2])
-            self.fictionWords[data[0]]=int(data[1])
+        data=cur.execute(sql_select)
+        for row in data:
+            self.fictionKeyDict[row[0]]=eval(row[2])
+            self.fictionWords[row[0]]=int(row[1])
             self.cout+=1
+            
     
     def  calculateTFIDF(self):
          for iword in self.fictionKeyDict:  #文章名
@@ -43,21 +39,22 @@ class TFIDF(object):
          reDict={}   #两层字典结构        
          for iword in self.fictionKeyDict:
              self.fictionInfo[iword]={}
-             reDict[iword]={}
+             reDict[iword]={} #子结构为字典，储存词的权值
              
              for jword in self.fictionKeyDict[iword]:
                  #TF,IDF的计算
                  TF=100*self.fictionKeyDict[iword][jword]/self.fictionWords[iword] 
                  IDF=math.log(self.cout)-math.log(self.allDict[jword])
+                 #self.fictionInfo[iword][jword]=TF*IDF
                  self.fictionInfo[iword][jword]=[TF,IDF,TF*IDF]
              #print (self.fictionInfo[iword])
-             
-             sortTFIDF=sorted(self.fictionInfo[iword].items(), key = lambda t:t[1][2], reverse=True) #按weight排序
+             sortTFIDF=self.fictionInfo[iword]
+             sortTFIDF=sorted(sortTFIDF.items(), key = lambda t:t[1][2], reverse=True) #按weight排序
              kcout=0
              for kword in sortTFIDF:
                  kcout+=1
                  if kcout >100:
-                     self.fictionInfo[iword].pop(kword)
+                     self.fictionInfo[iword].pop(kword[0])
                
              weightAll=0
              for jword in self.fictionInfo[iword]:
@@ -66,9 +63,11 @@ class TFIDF(object):
                  self.fictionInfo[iword][jword].append(float(100*self.fictionInfo[iword][jword][2]/weightAll))
                  reDict[iword][jword]=self.fictionInfo[iword][jword][3]
     
-             sortline=sorted(reDict[iword].items(), key = lambda t:t[1], reverse=True) #按weight排序
-             sql_update="UPDATE fiction SET TFIDF={0} WHERE id={1}".format(str(sortline),iword)
-             cur.execute(sql_update)      
+             #sortline=sorted(reDict[iword].items(), key = lambda t:t[1], reverse=True) #按weight排序
+             #sql_update="UPDATE fiction SET TFIDF={0} WHERE id={1}".format(str(reDict[iword]),iword)
+             sql_update="UPDATE fiction SET TFIDF=(?) WHERE id=(?)"
+             vals=[str(reDict[iword]),iword]
+             cur.execute(sql_update,vals)      
              conn.commit()
              
          conn.close()    
