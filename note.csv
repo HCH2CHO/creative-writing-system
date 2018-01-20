@@ -1,0 +1,24 @@
+writing recommend1.py
+遍历文库中的小说，获取每个词的词频、计算小说的易读性（sl句子平均单词数，wl每100词平均音节数），并储存到数据库中（词频最高的150词）
+格式如下fiction：
+            id  TEXT  PRIMARY KEY, 名称
+            words INT,  单词数
+            wordfre TEXT,词频字典
+            sl FLOAT,
+            wl FLOAT,
+            RE FLOAT,
+            TFIDF TEXT, 
+            reArticle TEXT 相关联文章
+
+writing recommend2.py
+计算TFIDF值并保留该值最大的100词，更新数据库中的TFIDF项
+计算IDF时所用的语料库为每篇文章词频最高的150词
+
+writing recommend3.py
+基于物品的协同过滤算法，根据用户浏览记录，计算文章之间的支持度和置信度，对满足条件的记录保存到数据库中的reArticle项
+条件：support>0.2 and confidence>0.5
+
+writing system.py 网页实时运行文件
+利用同writing recommend1.py的算法，计算用户输入内容的词频、易读性
+利用同writing recommend2.py的算法，计算输入内容的TFIDF，并计算它和文库中每篇文章之间的余弦相似度，对相似度较高的进行推荐
+
